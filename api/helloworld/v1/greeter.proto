@@ -3,6 +3,7 @@ syntax = "proto3";
 package helloworld.v1;
 
 import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "helloword/api/helloworld/v1;v1";
 option java_multiple_files = true;
@@ -17,6 +18,21 @@ service Greeter {
       get: "/helloworld/{name}"
     };
   }
+
+  rpc UploadFile (stream UploadRequest) returns (UploadResponse){
+    option (google.api.http) = {
+      post: "/helloworld/uploadFile"
+      body: "*"
+    };
+  }
+}
+
+message UploadRequest {
+  bytes Content = 2;
+}
+
+message UploadResponse {
+  string Message = 1;
 }
 
 // The request message containing the user's name.

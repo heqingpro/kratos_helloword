@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"io"
 
 	v1 "helloword/api/helloworld/v1"
 	"helloword/internal/biz"
@@ -26,4 +28,22 @@ func (s *GreeterService) SayHello(ctx context.Context, in *v1.HelloRequest) (*v1
 		return nil, err
 	}
 	return &v1.HelloReply{Message: "Hello " + g.Hello}, nil
+}
+
+func (s *GreeterService) UploadFile(conn v1.Greeter_UploadFileServer) error {
+	defer fmt.Println("finish")
+	data := make([]byte, 0)
+	for {
+		req, err := conn.Recv()
+		if err == io.EOF {
+			fmt.Printf("file: %d, content: %s", len(data), string(data))
+			return conn.SendAndClose(&v1.UploadResponse{
+				Message: "uploadSuccess",
+			})
+		}
+		if err != nil {
+			return err
+		}
+		data = append(data, req.Content...)
+	}
 }
